@@ -1,0 +1,1744 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAST MISTAKE</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+body{
+background:#050816;
+overflow:hidden;
+color:white;
+user-select:none;
+touch-action:none;
+transition: filter 0.3s ease;
+}
+#game{
+width:100vw;
+height:100vh;
+position:relative;
+overflow:hidden;
+background:radial-gradient(circle at top,#172554,#020617 60%);
+transition: transform 0.2s ease, background 0.5s ease;
+}
+.topBar{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+padding:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+z-index:10;
+}
+.card{
+background:rgba(255,255,255,.08);
+padding:14px 20px;
+border-radius:18px;
+backdrop-filter:blur(12px);
+font-weight:700;
+}
+.center{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+width:90%;
+}
+.title{
+font-size:clamp(48px,9vw,110px);
+font-weight:900;
+letter-spacing:4px;
+}
+.subtitle{
+margin-top:10px;
+color:#cbd5e1;
+font-size:20px;
+}
+.btn{
+margin-top:30px;
+display:inline-block;
+padding:18px 36px;
+border-radius:18px;
+background:white;
+color:black;
+font-weight:900;
+font-size:22px;
+cursor:pointer;
+transition:.2s;
+}
+.btn:hover{
+transform:scale(1.05);
+}
+#roundTitle{
+font-size:50px;
+font-weight:900;
+margin-bottom:20px;
+}
+#instruction{
+font-size:34px;
+font-weight:800;
+}
+#arena{
+position:absolute;
+inset:0;
+transition: filter 0.2s ease;
+}
+.circleBtn{
+width:110px;
+height:110px;
+border-radius:50%;
+position:absolute;
+transform:translate(-50%,-50%) scale(1);
+cursor:pointer;
+transition: transform .08s, box-shadow .08s, filter .08s;
+}
+.hidden{
+display:none;
+}
+#countdown{
+font-size:140px;
+font-weight:900;
+animation:pulse 1s infinite;
+}
+@keyframes pulse{
+0%{transform:scale(1)}
+50%{transform:scale(1.08)}
+100%{transform:scale(1)}
+}
+.playerList{
+position:absolute;
+left:20px;
+bottom:20px;
+width:260px;
+max-height:50vh;
+overflow:auto;
+background:rgba(255,255,255,.07);
+padding:16px;
+border-radius:18px;
+}
+.playerRow{
+display:flex;
+justify-content:space-between;
+padding:8px 0;
+border-bottom:1px solid rgba(255,255,255,.06);
+}
+.alive{
+color:#22c55e;
+}
+.dead{
+color:#ef4444;
+text-decoration:line-through;
+opacity:.6;
+}
+#eliminatedBanner{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:72px;
+font-weight:900;
+color:#ef4444;
+display:none;
+z-index:50;
+animation:pop .4s ease;
+}
+@keyframes pop{
+from{transform:translate(-50%,-50%) scale(.4);opacity:0}
+to{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+.flash{ position:absolute; inset:0; background:white; opacity:0; pointer-events:none; z-index:90; }
+
+.popup{
+position:absolute;
+background:white;
+color:black;
+padding:18px;
+border-radius:16px;
+width:320px;
+box-shadow:0 10px 50px rgba(0,0,0,.5);
+animation:popupAnim .3s ease;
+z-index: 100;
+}
+.popup button{
+margin-top:15px;
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#2563eb;
+color:white;
+font-weight:700;
+cursor:pointer;
+}
+@keyframes popupAnim{
+from{transform:scale(.5);opacity:0}
+to{transform:scale(1);opacity:1}
+}
+.shake{
+animation:shakeAnim .15s infinite;
+}
+@keyframes shakeAnim{
+0%{transform:translate(3px,0)}
+25%{transform:translate(-3px,0)}
+50%{transform:translate(0,3px)}
+75%{transform:translate(0,-3px)}
+100%{transform:translate(3px,0)}
+}
+.glitch{
+animation:glitchAnim .08s infinite;
+}
+@keyframes glitchAnim{
+0%{filter:hue-rotate(0deg)}
+100%{filter:hue-rotate(90deg)}
+}
+.fakeNotif{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#111827;
+padding:18px 25px;
+border-radius:18px;
+width:380px;
+max-width:90vw;
+border:1px solid rgba(255,255,255,.1);
+animation:slideDown .4s ease;
+z-index: 100;
+}
+@keyframes slideDown{
+from{transform:translate(-50%,-120px)}
+to{transform:translate(-50%,0)}
+}
+.fakeButton{
+position:absolute;
+padding:20px 35px;
+background:#ef4444;
+border-radius:20px;
+font-weight:800;
+animation:pulseBtn 1s infinite;
+z-index: 100;
+cursor:pointer;
+}
+@keyframes pulseBtn{
+0%{transform:scale(1)}
+50%{transform:scale(1.1)}
+100%{transform:scale(1)}
+}
+.crack{
+position:absolute;
+inset:0;
+background:url('https://i.imgur.com/eM3g1QX.png') center/cover;
+opacity:.35;
+pointer-events:none;
+z-index: 100;
+}
+
+#endScreen{
+position:fixed;
+inset:0;
+display:none; 
+align-items:flex-start;
+justify-content:center;
+background:radial-gradient(circle at center,#220033,#020617 70%);
+overflow-y:auto; 
+-webkit-overflow-scrolling:touch;
+z-index: 500;
+padding: 30px 10px;
+}
+#particles{
+position:absolute;
+inset:0;
+overflow:hidden;
+pointer-events:none;
+}
+.particle{
+position:absolute;
+width:6px;
+height:6px;
+border-radius:50%;
+background:rgba(255,255,255,.4);
+animation:float 10s linear infinite;
+}
+@keyframes float{
+0%{ transform:translateY(100vh) scale(0.5); opacity:0; }
+20%{ opacity:1; }
+100%{ transform:translateY(-120vh) scale(1.4); opacity:0; }
+}
+#card{
+position:relative;
+width:min(950px,94vw);
+padding:30px 24px;
+margin:auto;
+border-radius:32px;
+background:rgba(10,10,25,.78);
+border:2px solid rgba(168,85,247,.25);
+backdrop-filter:blur(14px);
+box-shadow: 0 0 80px rgba(168,85,247,.18), 0 0 140px rgba(255,0,80,.12);
+text-align:center;
+overflow:hidden;
+animation:slam .6s ease;
+}
+@keyframes slam{
+0%{ transform:scale(1.15); opacity:0; filter:blur(12px); }
+100%{ transform:scale(1); opacity:1; filter:blur(0px); }
+}
+#bgPulse{
+position:absolute;
+inset:0;
+background:radial-gradient(circle,#ff003344,transparent 65%);
+animation:premiumPulse 3s infinite;
+pointer-events:none;
+}
+@keyframes premiumPulse{
+0%{opacity:.3;}
+50%{opacity:.9;}
+100%{opacity:.3;}
+}
+#title{
+font-size:clamp(40px,7vw,90px);
+font-weight:900;
+letter-spacing:4px;
+text-shadow:0 0 30px rgba(255,255,255,.3);
+line-height:1.1;
+}
+#subtitle{
+margin-top:8px;
+font-size:32px;
+font-weight:900;
+color:#ef4444;
+}
+#placement{
+margin-top:10px;
+font-size:26px;
+font-weight:800;
+color:#22c55e;
+}
+#cause{
+margin-top:15px;
+font-size:22px;
+color:#fca5a5;
+padding:0 10px;
+}
+#almost{
+margin-top:12px;
+font-size:20px;
+color:#facc15;
+font-weight:800;
+}
+#stats{
+margin-top:25px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:12px;
+}
+.stat{
+background:rgba(255,255,255,.05);
+padding:14px;
+border-radius:18px;
+border:1px solid rgba(255,255,255,.08);
+}
+.stat h2{
+margin:0;
+font-size:15px;
+opacity:.7;
+}
+.stat p{
+margin-top:8px;
+font-size:28px;
+font-weight:900;
+}
+#fightArea{
+margin-top:25px;
+height:80px;
+border-radius:20px;
+background:rgba(255,255,255,.04);
+position:relative;
+overflow:hidden;
+border:1px solid rgba(255,255,255,.08);
+}
+.bot{
+position:absolute;
+top:15px;
+width:50px;
+height:50px;
+border-radius:50%;
+background:linear-gradient(135deg,#60a5fa,#a855f7);
+box-shadow:0 0 20px rgba(96,165,250,.5);
+animation:fight 3s infinite alternate ease-in-out;
+}
+.bot:nth-child(2){
+left:70%;
+animation-delay:1s;
+background:linear-gradient(135deg,#ef4444,#f59e0b);
+}
+@keyframes fight{
+0%{ transform:translateX(-40px) scale(1); }
+100%{ transform:translateX(40px) scale(1.1); }
+}
+#buttons{
+margin-top:30px;
+display:flex;
+justify-content:center;
+gap:16px;
+flex-wrap:wrap;
+}
+.endBtn{
+padding:16px 32px;
+border-radius:18px;
+font-size:22px;
+font-weight:900;
+cursor:pointer;
+transition:.25s;
+border:none;
+z-index: 10;
+position: relative;
+}
+.endBtn:hover{
+transform:scale(1.06);
+}
+.home{
+background:rgba(255,255,255,.08);
+color:white;
+}
+.restart{
+background:linear-gradient(135deg,#facc15,#f59e0b);
+color:black;
+box-shadow:0 12px 30px rgba(250,204,21,.3);
+}
+
+.soundwave-container {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 6px;
+height: 60px;
+margin: 20px auto;
+}
+.soundwave-bar {
+width: 6px;
+height: 15px;
+background: linear-gradient(to top, #3b82f6, #8b5cf6);
+border-radius: 4px;
+animation: microPulse 0.6s infinite alternate ease-in-out;
+}
+.soundwave-bar:nth-child(2) { animation-delay: 0.1s; height: 25px; }
+.soundwave-bar:nth-child(3) { animation-delay: 0.2s; height: 45px; background: #ec4899; }
+.soundwave-bar:nth-child(4) { animation-delay: 0.3s; height: 30px; }
+.soundwave-bar:nth-child(5) { animation-delay: 0.4s; height: 18px; }
+
+@keyframes microPulse {
+0% { transform: scaleY(0.7); filter: brightness(0.9); }
+100% { transform: scaleY(1.3); filter: brightness(1.3); box-shadow: 0 0 15px rgba(139,92,246,0.6); }
+}
+
+@media (max-height: 600px) {
+  #card { padding: 20px 16px; }
+  #stats { margin-top: 15px; }
+  .stat { padding: 10px; }
+  .stat p { font-size: 22px; }
+  #fightArea { display: none; }
+  #buttons { margin-top: 20px; }
+}
+
+@keyframes feedSlide{
+from{ opacity:0; transform:translateX(100px); }
+to{ opacity:1; transform:translateX(0px); }
+}
+@keyframes victoryZoom{
+0%{ transform:scale(.4); opacity:0; }
+100%{ transform:scale(1); opacity:1; }
+}
+</style>
+</head>
+<body>
+<div id="game">
+<div class="topBar">
+<div class="card" id="rank" style="display:flex; align-items:center; gap:8px;">
+<div id="rankBadge" style="width:14px; height:14px; border-radius:50%; background:#cd7f32; box-shadow:0 0 8px #cd7f32;"></div>
+<span>Rank: Bronze</span>
+</div>
+<div class="card" id="aliveCount">20 Alive</div>
+<div class="card" id="wins">Wins: 0</div>
+</div>
+<div id="arena"></div>
+<div class="flash" id="flash"></div>
+<div class="center" id="menu">
+<div class="title">LAST MISTAKE</div>
+<div class="subtitle">One mistake and you're eliminated.</div>
+<div class="btn" onclick="startMatch()">PLAY MATCH</div>
+</div>
+<div class="center hidden" id="gameUI">
+<div id="countdown"></div>
+<div id="roundTitle"></div>
+<div id="instruction"></div>
+<div class="soundwave-container" id="soundwaveVisualizer">
+<div class="soundwave-bar"></div>
+<div class="soundwave-bar"></div>
+<div class="soundwave-bar"></div>
+<div class="soundwave-bar"></div>
+<div class="soundwave-bar"></div>
+</div>
+</div>
+<div class="playerList" id="playerList"></div>
+<div id="eliminatedBanner">ELIMINATED</div>
+
+<div id="endScreen">
+<div id="particles"></div>
+<div id="card">
+<div id="bgPulse"></div>
+<div id="title">HEARTBREAK</div>
+<div id="subtitle">ROUND 11</div>
+<div id="placement">#2 / 20 SURVIVORS</div>
+<div id="cause">❌ Pressed the wrong color</div>
+<div id="almost">⚡ YOU WERE 1 ROUND FROM VICTORY</div>
+<div id="stats">
+<div class="stat">
+<h2>ROUNDS</h2>
+<p id="statRounds">0</p>
+</div>
+<div class="stat">
+<h2>FASTEST TAP</h2>
+<p id="statFastest">--</p>
+</div>
+<div class="stat">
+<h2>ACCURACY</h2>
+<p id="statAccuracy">100%</p>
+</div>
+<div class="stat">
+<h2>ELIMINATED BOTS</h2>
+<p id="statEliminated">0</p>
+</div>
+</div>
+<div id="fightArea">
+<div class="bot"></div>
+<div class="bot"></div>
+</div>
+<div id="buttons">
+<button class="endBtn home" onclick="goHome()">🏠 HOME</button>
+<button class="endBtn restart" onclick="restartGame()">🔄 RESTART</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const arena = document.getElementById('arena');
+const menu = document.getElementById('menu');
+const gameUI = document.getElementById('gameUI');
+const countdownEl = document.getElementById('countdown');
+const roundTitle = document.getElementById('roundTitle');
+const instruction = document.getElementById('instruction');
+const playerList = document.getElementById('playerList');
+const aliveCount = document.getElementById('aliveCount');
+const eliminatedBanner = document.getElementById('eliminatedBanner');
+const endScreen = document.getElementById('endScreen');
+const winsEl = document.getElementById('wins');
+const rankEl = document.getElementById('rank');
+const flash = document.getElementById('flash');
+const game = document.getElementById('game');
+
+const botProfiles = [
+{ name:'ShadowX', type:'Speed Demon', reaction:.95, memory:.35, panic:.30, trait:'⚡ Extremely fast reactions' },
+{ name:'Nova', type:'Memory Master', reaction:.55, memory:.95, panic:.12, trait:'🧠 Never forgets patterns' },
+{ name:'Ghost', type:'Ice Cold', reaction:.70, memory:.70, panic:.02, trait:'❄ Never panics' },
+{ name:'Toxic', type:'Choker', reaction:.80, memory:.75, panic:.55, trait:'💀 Collapses under pressure' },
+{ name:'Ace', type:'Final Boss', reaction:.92, memory:.88, panic:.04, trait:'👑 Endgame monster' },
+{ name:'Reactor', type:'Adaptive AI', reaction:.78, memory:.78, panic:.15, trait:'⚙ Learns every round' },
+{ name:'Blaze', type:'Aggressive', reaction:.90, memory:.40, panic:.28, trait:'🔥 Takes risky plays' },
+{ name:'Pixel', type:'Balanced', reaction:.72, memory:.72, panic:.18, trait:'🎯 Stable all-rounder' }
+];
+
+let players=[];
+let alivePlayers=[];
+let playerAlive=true;
+let round=0;
+let wins=Number(localStorage.getItem('lm_wins')||0);
+let currentMiniGame='';
+let acceptingInput=false;
+let freezeTouched=false;
+let expectedSequence=[];
+let playerSequence=[];
+let tapCorrect=false;
+let roundTimer;
+let roundTimeLeft=0;
+let lastMiniGame='';
+let trapIndex = 0; 
+let suddenDeathActive = false; 
+let botActionTimeout = null;
+
+let spectatorMode = false;
+let finalDuelAnimInstance = null;
+
+let roundStartTime = 0;
+let fastestTap = Infinity;
+let totalActions = 0;
+let correctActions = 0;
+let specificCauseOfDeath = "Timed Out!";
+
+winsEl.innerHTML='Wins: '+wins;
+
+function startMatch(){
+menu.classList.add('hidden');
+gameUI.classList.remove('hidden');
+setupPlayers();
+nextRound();
+}
+
+function setupPlayers(){
+players=[];
+playerAlive=true;
+spectatorMode = false;
+round=0;
+suddenDeathActive = false;
+fastestTap = Infinity;
+totalActions = 0;
+correctActions = 0;
+
+players.push({
+name:'YOU',
+type:'Human Player',
+alive:true,
+isPlayer:true,
+reaction:0.9,
+memory:0.9,
+panic:0.05,
+trait: '🎮 Self-controlled manual input'
+});
+
+for(let i=0; i<19; i++){
+const profile = botProfiles[i % botProfiles.length];
+players.push({
+name: profile.name + (i >= botProfiles.length ? '_' + (i - botProfiles.length + 1) : ''),
+alive: true,
+isPlayer: false,
+reaction: profile.reaction,
+memory: profile.memory,
+panic: profile.panic,
+trait: profile.trait,
+aiType: profile.type
+});
+}
+
+updatePlayerList();
+}
+
+function updatePlayerList(){
+alivePlayers = players.filter(p=>p.alive);
+aliveCount.innerHTML = alivePlayers.length + ' Alive';
+
+const finalists = players.filter(p=>p.alive);
+if(finalists.length === 2){
+instruction.innerHTML = `${finalists[0].name} VS ${finalists[1].name}`;
+game.style.background = 'radial-gradient(circle, #450a0a, #020617)';
+}
+
+playerList.innerHTML='';
+players.forEach(p=>{
+const row=document.createElement('div');
+row.className='playerRow';
+row.innerHTML=`
+<span class="${p.alive?'alive':'dead'}">${p.name} <small style="opacity:0.5; font-size:10px;">[${p.aiType || p.type}]</small></span>
+<span>${p.alive?'🟢':'💀'}</span>
+`;
+playerList.appendChild(row);
+});
+}
+
+function nextRound(){
+if (spectatorMode) return;
+
+arena.style.filter = 'blur(10px)';
+clearArena();
+if(botActionTimeout) clearTimeout(botActionTimeout);
+round++;
+
+if(round >= 8) {
+  document.body.style.filter = 'saturate(1.2) contrast(1.1)';
+} else {
+  document.body.style.filter = 'none';
+}
+
+if(!playerAlive){
+startSpectatorMode();
+return;
+}
+
+if(alivePlayers.length<=1){
+winGame();
+return;
+}
+
+suddenDeathActive = (alivePlayers.length === 2);
+
+const games=['tapColor','freeze','memory','chaosRound','followDot'];
+let selected = games[Math.floor(Math.random()*games.length)];
+while(selected===lastMiniGame){
+selected = games[Math.floor(Math.random()*games.length)];
+}
+lastMiniGame = selected;
+
+setTimeout(()=>{
+window[selected]();
+},1200);
+}
+
+function countdown(num,callback){
+if (spectatorMode) return;
+game.style.transform = 'scale(1.02)';
+
+countdownEl.innerHTML=num;
+let n=num;
+const interval=setInterval(()=>{
+n--;
+if(n<=0){
+clearInterval(interval);
+countdownEl.innerHTML='GO';
+game.style.transform = 'scale(1)';
+arena.style.filter = 'blur(0px)';
+
+setTimeout(()=>{
+countdownEl.innerHTML='';
+callback();
+},500);
+}else{
+countdownEl.innerHTML=n;
+}
+},1000);
+}
+
+function startRoundTimer(seconds){
+clearInterval(roundTimer);
+roundTimeLeft = seconds;
+const old=document.getElementById('liveTimer');
+if(old) old.remove();
+const timerBox=document.createElement('div');
+timerBox.id='liveTimer';
+timerBox.style.position='absolute';
+timerBox.style.top='120px';
+timerBox.style.left='50%';
+timerBox.style.transform='translateX(-50%)';
+timerBox.style.padding='16px 28px';
+timerBox.style.borderRadius='20px';
+timerBox.style.background='rgba(0,0,0,.6)';
+timerBox.style.fontSize='40px';
+timerBox.style.fontWeight='900';
+timerBox.style.zIndex='80';
+timerBox.style.transition = 'transform 0.1s ease, color 0.1s ease';
+timerBox.innerHTML='⏱ '+seconds.toFixed(1)+'s';
+game.appendChild(timerBox);
+
+roundTimer=setInterval(()=>{
+roundTimeLeft-=0.1;
+if(roundTimeLeft<=0){
+clearInterval(roundTimer);
+roundTimeLeft=0}
+const t=document.getElementById('liveTimer');
+if(t) {
+  t.innerHTML='⏱ '+roundTimeLeft.toFixed(1)+'s';
+  if(roundTimeLeft < 1.5) {
+    t.style.color = '#ef4444';
+    t.style.transform = 'translateX(-50%) scale(1.15)';
+  }
+}
+},100);
+}
+
+function touchFeedback(x,y){
+const fx=document.createElement('div');
+fx.style.position='absolute';
+fx.style.left=x+'px';
+fx.style.top=y+'px';
+fx.style.width='120px';
+fx.style.height='120px';
+fx.style.borderRadius='50%';
+fx.style.transform='translate(-50%,-50%)';
+fx.style.background='radial-gradient(circle,rgba(255,255,255,.9),transparent 70%)';
+fx.style.pointerEvents='none';
+fx.style.zIndex='999';
+fx.style.animation='tapAnim .4s ease-out forwards';
+game.appendChild(fx);
+if(navigator.vibrate) navigator.vibrate(40);
+setTimeout(()=>fx.remove(),400);
+}
+
+const tapStyle=document.createElement('style');
+tapStyle.innerHTML=`@keyframes tapAnim{0%{opacity:1;transform:translate(-50%,-50%) scale(.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}`;
+document.head.appendChild(tapStyle);
+
+function handleSuddenDeathResolution(winnerIsPlayer) {
+acceptingInput = false;
+if(botActionTimeout) clearTimeout(botActionTimeout);
+
+if(winnerIsPlayer) {
+const bot = players.find(p => !p.isPlayer && p.alive);
+if(bot) bot.alive = false;
+updatePlayerList();
+resolveRound();
+} else {
+specificCauseOfDeath = "Opponent beat you in the Sudden Death race!";
+eliminatePlayer();
+loseGame();
+}
+}
+
+function trackReactionTime() {
+const elapsed = (performance.now() - roundStartTime) / 1000;
+if(elapsed < fastestTap) {
+fastestTap = elapsed;
+}
+}
+
+function applyTapConfirmation(btn) {
+  btn.style.transform = 'translate(-50%,-50%) scale(.82)';
+  btn.style.boxShadow = '0 0 50px white';
+  setTimeout(() => {
+    btn.style.transform = 'translate(-50%,-50%) scale(1)';
+  }, 120);
+}
+
+function tapColor(){
+currentMiniGame='tapColor';
+tapCorrect=false;
+specificCauseOfDeath = "Timed out on selecting color!";
+roundTitle.innerHTML= suddenDeathActive ? 'SUDDEN DEATH 1V1' : 'ROUND ' + round;
+
+const colors=['red','blue','green','yellow'];
+const target=colors[Math.floor(Math.random()*colors.length)];
+if(!suddenDeathActive) {
+  instruction.innerHTML = 'TAP ' + target.toUpperCase();
+}
+
+const timeLimit = round >= 8 ? 3 : 4;
+
+countdown(3,()=>{
+acceptingInput=true;
+roundStartTime = performance.now();
+startRoundTimer(timeLimit);
+
+colors.forEach(color=>{
+const btn=document.createElement('div');
+btn.className='circleBtn';
+btn.style.background=color;
+btn.style.left=(20+Math.random()*60)+'vw';
+btn.style.top=(25+Math.random()*55)+'vh';
+btn.dataset.color=color;
+
+btn.onclick=()=>{
+if(!acceptingInput) return;
+applyTapConfirmation(btn);
+totalActions++;
+if(color===target){
+correctActions++;
+trackReactionTime();
+flashEffect();
+if(suddenDeathActive) {
+handleSuddenDeathResolution(true);
+} else {
+tapCorrect=true;
+acceptingInput=false;
+}
+} else {
+specificCauseOfDeath = `Pressed ${color.toUpperCase()} instead of ${target.toUpperCase()}!`;
+eliminatePlayer();
+acceptingInput=false;
+if(suddenDeathActive) {
+handleSuddenDeathResolution(false); 
+} else {
+loseGame();
+}
+}
+};
+arena.appendChild(btn);
+});
+
+simulateBots('tapColor',target);
+
+if(!suddenDeathActive) {
+setTimeout(()=>{
+if(!acceptingInput) return;
+acceptingInput=false;
+if(!tapCorrect && playerAlive) {
+eliminatePlayer();
+loseGame();
+} else {
+resolveRound();
+}
+}, (timeLimit * 1000 - 500));
+}
+});
+}
+
+function freeze(){
+currentMiniGame='freeze';
+freezeTouched=false;
+specificCauseOfDeath = "Fell into temptation and touched during freeze!";
+roundTitle.innerHTML='ROUND '+round;
+if(!suddenDeathActive) {
+  instruction.innerHTML='DON\'T TOUCH';
+}
+
+countdown(3,()=>{
+acceptingInput=true;
+roundStartTime = performance.now();
+startRoundTimer(7); 
+simulateBots('freeze');
+
+setTimeout(()=>{
+  if(acceptingInput) runSingleTrap(trapIndex);
+  trapIndex = (trapIndex + 1) % 10; 
+}, 1500);
+
+setTimeout(()=>{
+acceptingInput=false;
+document.querySelectorAll('.popup,.fakeNotif,.fakeButton,.crack').forEach(e=>e.remove());
+game.classList.remove('shake','glitch');
+
+if(freezeTouched && playerAlive) {
+eliminatePlayer();
+if(suddenDeathActive) { handleSuddenDeathResolution(false); } else { loseGame(); }
+return;
+} else if(suddenDeathActive && !freezeTouched && playerAlive) {
+const bot = players.find(p => !p.isPlayer);
+if(bot && !bot.alive) {
+handleSuddenDeathResolution(true);
+return;
+}
+}
+resolveRound();
+},7000);
+});
+}
+
+function runSingleTrap(index){
+if(!acceptingInput) return;
+switch(index) {
+case 0:
+const notif1 = document.createElement('div');
+notif1.className='fakeNotif';
+notif1.innerHTML='<b>MESSAGE</b><br>Your friend challenged you. Tap to open.';
+arena.appendChild(notif1);
+break;
+case 1:
+const popup1 = document.createElement('div');
+popup1.className='popup';
+popup1.style.left=Math.random()*60+'vw';
+popup1.style.top=Math.random()*50+'vh';
+popup1.innerHTML=`<h2>System Alert</h2><p>Your storage is almost full.</p><button>Fix Now</button>`;
+arena.appendChild(popup1);
+break;
+case 2:
+const btn = document.createElement('div');
+btn.className='fakeButton';
+btn.innerHTML='FREE MONEY';
+btn.style.left=Math.random()*60+'vw';
+btn.style.top=Math.random()*60+'vh';
+arena.appendChild(btn);
+break;
+case 3:
+game.classList.add('shake');
+break;
+case 4:
+const popup2 = document.createElement('div');
+popup2.className='popup';
+popup2.style.left='50%';
+popup2.style.top='50%';
+popup2.style.transform='translate(-50%,-50%)';
+popup2.innerHTML=`<h2>🎉 YOU WON</h2><p>Tap to claim your reward.</p><button>CLAIM</button>`;
+arena.appendChild(popup2);
+break;
+case 5:
+flash.style.transition='none';
+flash.style.opacity='1';
+setTimeout(()=>{
+flash.style.transition='1s';
+flash.style.opacity='0';
+},100);
+break;
+case 6:
+const crack = document.createElement('div');
+crack.className='crack';
+arena.appendChild(crack);
+break;
+case 7:
+game.classList.add('glitch');
+break;
+case 8:
+const notif2 = document.createElement('div');
+notif2.className='fakeNotif';
+notif2.innerHTML='<b>⚠ Battery Critical</b><br>1% remaining. Plug charger now.';
+arena.appendChild(notif2);
+break;
+case 9:
+const notif3 = document.createElement('div');
+notif3.className='fakeNotif';
+notif3.innerHTML='<b>📞 Incoming Call</b><br>Mom is calling...';
+arena.appendChild(notif3);
+break;
+}
+}
+
+function memory(){
+currentMiniGame='memory';
+expectedSequence=[];
+playerSequence=[];
+specificCauseOfDeath = "Failed to copy the structural memory pattern!";
+roundTitle.innerHTML= suddenDeathActive ? 'SUDDEN DEATH 1V1' : 'ROUND ' + round;
+instruction.innerHTML='MEMORIZE THE SEQUENCE';
+
+const colors=['red','blue','green'];
+
+countdown(3,()=>{
+let i=0;
+const show=setInterval(()=>{
+const color=colors[Math.floor(Math.random()*colors.length)];
+expectedSequence.push(color);
+flashColor(color);
+i++;
+
+if(i>=3){
+clearInterval(show);
+setTimeout(()=>{
+showMemoryButtons(colors);
+},1200);
+}
+},800);
+});
+}
+
+function showMemoryButtons(colors){
+if(!suddenDeathActive) {
+  instruction.innerHTML = 'REPEAT THE SEQUENCE';
+}
+acceptingInput=true;
+roundStartTime = performance.now();
+
+const timeLimit = round >= 8 ? 3 : 5;
+startRoundTimer(timeLimit);
+
+colors.forEach(color=>{
+const btn=document.createElement('div');
+btn.className='circleBtn';
+btn.style.background=color;
+btn.style.left=(25+Math.random()*50)+'vw';
+btn.style.top=(35+Math.random()*40)+'vh';
+
+btn.onclick=()=>{
+if(!acceptingInput) return;
+applyTapConfirmation(btn);
+totalActions++;
+playerSequence.push(color);
+const currentIndex=playerSequence.length-1;
+
+if(playerSequence[currentIndex]!==expectedSequence[currentIndex]){
+eliminatePlayer();
+acceptingInput=false;
+if(suddenDeathActive) {
+handleSuddenDeathResolution(false);
+} else {
+loseGame();
+}
+return;
+}
+
+correctActions++;
+if(playerSequence.length===expectedSequence.length){
+trackReactionTime();
+flashEffect();
+if(suddenDeathActive) {
+handleSuddenDeathResolution(true);
+} else {
+acceptingInput=false;
+resolveRound();
+}
+}
+};
+arena.appendChild(btn);
+});
+
+simulateBots('memory');
+
+if(!suddenDeathActive) {
+setTimeout(()=>{
+if(acceptingInput){
+acceptingInput=false;
+eliminatePlayer();
+loseGame();
+}
+}, (timeLimit * 1000));
+}
+}
+
+function flashColor(color){
+flash.style.background=color;
+flash.style.opacity='.8';
+setTimeout(()=>{
+flash.style.opacity='0';
+},300);
+}
+
+function chaosRound(){
+currentMiniGame='chaosRound';
+specificCauseOfDeath = "Disobeyed the quick-logic modifier alert!";
+roundTitle.innerHTML= suddenDeathActive ? 'SUDDEN DEATH 1V1' : 'ROUND ' + round;
+
+const avoidBlue = Math.random() > 0.5;
+if(!suddenDeathActive) {
+  instruction.innerHTML = avoidBlue ? "DON'T PRESS BLUE" : "PRESS BLUE TO SURVIVE";
+}
+
+const tiny=document.createElement('div');
+tiny.style.marginTop='20px';
+tiny.style.fontSize='16px';
+tiny.style.opacity='.8';
+tiny.innerHTML = avoidBlue ? '(pressing blue eliminates you)' : '(everyone else loses)';
+instruction.appendChild(tiny);
+
+const timeLimit = round >= 8 ? 3 : 4;
+
+countdown(3,()=>{
+acceptingInput=true;
+roundStartTime = performance.now();
+startRoundTimer(timeLimit);
+
+let playerActed = false;
+
+['red','blue','green'].forEach((color,i)=>{
+const btn=document.createElement('div');
+btn.className='circleBtn';
+btn.style.background=color;
+btn.style.left=(25+i*25)+'vw';
+btn.style.top='50vh';
+
+btn.onclick=()=>{
+if(!acceptingInput) return;
+applyTapConfirmation(btn);
+playerActed = true;
+totalActions++;
+
+const correct = avoidBlue ? (color !== 'blue') : (color === 'blue');
+
+if(correct){
+correctActions++;
+trackReactionTime();
+flashEffect();
+if(suddenDeathActive) {
+handleSuddenDeathResolution(true);
+} else {
+acceptingInput=false;
+resolveRound();
+}
+}else{
+specificCauseOfDeath = avoidBlue ? "You clicked blue when forbidden!" : "Failed to activate blue rule constraint!";
+eliminatePlayer();
+acceptingInput=false;
+if(suddenDeathActive) {
+handleSuddenDeathResolution(false);
+} else {
+loseGame();
+}
+}
+};
+arena.appendChild(btn);
+});
+
+simulateBots('chaos', avoidBlue);
+
+if(!suddenDeathActive) {
+setTimeout(() => {
+if(acceptingInput){
+acceptingInput = false;
+if(!avoidBlue && !playerActed) {
+eliminatePlayer();
+loseGame();
+} else {
+resolveRound();
+}
+}
+}, (timeLimit * 1000));
+}
+});
+}
+
+function followDot(){
+currentMiniGame='followDot';
+specificCauseOfDeath = "Missed tracking coordinates on the traveling entity!";
+roundTitle.innerHTML= suddenDeathActive ? 'SUDDEN DEATH 1V1' : 'ROUND ' + round;
+if(!suddenDeathActive) {
+  instruction.innerHTML = 'TAP THE MOVING DOT';
+}
+
+const timeLimit = round >= 8 ? 3 : 6;
+
+countdown(3,()=>{
+acceptingInput=true;
+roundStartTime = performance.now();
+startRoundTimer(timeLimit);
+
+const dot=document.createElement('div');
+dot.style.position='absolute';
+dot.style.width='90px';
+dot.style.height='90px';
+dot.style.borderRadius='50%';
+dot.style.background='linear-gradient(135deg,#60a5fa,#a855f7)';
+dot.style.boxShadow='0 0 40px #60a5fa';
+dot.style.left='50vw';
+dot.style.top='50vh';
+dot.style.cursor='pointer';
+dot.className = 'circleBtn';
+
+let x=50;
+let y=50;
+
+const move=setInterval(()=>{
+x=10+Math.random()*80;
+y=20+Math.random()*60;
+dot.style.left=x+'vw';
+dot.style.top=y+'vh';
+},700);
+
+dot.onclick=()=>{
+if(!acceptingInput) return;
+applyTapConfirmation(dot);
+totalActions++;
+correctActions++;
+trackReactionTime();
+clearInterval(move);
+flashEffect();
+if(suddenDeathActive) {
+handleSuddenDeathResolution(true);
+} else {
+acceptingInput=false;
+resolveRound();
+}
+};
+arena.appendChild(dot);
+
+simulateBots('followDot');
+
+if(!suddenDeathActive) {
+setTimeout(()=>{
+if(acceptingInput){
+clearInterval(move);
+acceptingInput=false;
+eliminatePlayer();
+loseGame();
+}
+}, (timeLimit * 1000));
+}
+});
+}
+
+function simulateBots(type, extraParam){
+const activeBot = players.find(p => !p.isPlayer && p.alive);
+if(!activeBot) return;
+
+if(suddenDeathActive) {
+  let reactionModifier = 1 - (activeBot.reaction * 0.4); 
+  let reactionDelay = (500 + (Math.random() * 900)) * reactionModifier; 
+  
+  if(type === 'memory') reactionDelay += (800 * (1 - activeBot.memory));      
+  if(type === 'freeze') reactionDelay = 4000;       
+
+  botActionTimeout = setTimeout(() => {
+    if(!acceptingInput) return;
+
+    let dynamicPanic = activeBot.panic;
+    if(round >= 8 || suddenDeathActive) dynamicPanic += 0.25; 
+
+    if(type === 'freeze') {
+      if(activeBot.name.startsWith('Ghost')) dynamicPanic = 0; 
+      if(Math.random() < dynamicPanic) {
+        activeBot.alive = false;
+        handleSuddenDeathResolution(true); 
+      }
+    } else {
+      let botErrorChance = dynamicPanic * 0.35;
+      if(type === 'memory' && activeBot.name.startsWith('Nova')) botErrorChance = 0;
+      if(type === 'tapColor' && activeBot.name.startsWith('ShadowX')) botErrorChance *= 0.1;
+
+      if(Math.random() < botErrorChance) {
+        activeBot.alive = false;
+        handleSuddenDeathResolution(true); 
+      } else {
+        handleSuddenDeathResolution(false); 
+      }
+    }
+  }, reactionDelay);
+
+  return; 
+}
+
+players.forEach(bot=>{
+  if(bot.isPlayer || !bot.alive) return;
+
+  let baseFailChance = bot.panic * 0.4;
+  if(round >= 8) baseFailChance += 0.2; 
+
+  if(type==='tapColor') {
+    baseFailChance += (1 - bot.reaction) * 0.3;
+    if(bot.name.startsWith('ShadowX')) baseFailChance *= 0.2;
+  }
+  if(type==='freeze') {
+    baseFailChance += bot.panic * 0.4;
+    if(bot.name.startsWith('Ghost')) baseFailChance = 0;
+  }
+  if(type==='memory') {
+    baseFailChance += (1 - bot.memory) * 0.5;
+    if(bot.name.startsWith('Nova')) baseFailChance = 0;
+  }
+
+  if(Math.random() < baseFailChance){
+    setTimeout(()=>{
+      bot.alive=false;
+      createKillFeed(`💀 ${bot.name} eliminated`);
+      updatePlayerList();
+    }, 500 + Math.random() * 2000);
+  }
+});
+}
+
+function resolveRound(){
+if (spectatorMode) return;
+const t=document.getElementById('liveTimer');
+if(t) t.remove();
+clearInterval(roundTimer);
+
+setTimeout(()=>{
+updatePlayerList();
+clearArena();
+tapCorrect=false;
+nextRound();
+},2000);
+}
+
+function triggerPainfulMistakeFeedback() {
+  document.body.animate([
+    { transform: 'translateX(-10px)' },
+    { transform: 'translateX(10px)' },
+    { transform: 'translateX(-8px)' },
+    { transform: 'translateX(8px)' },
+    { transform: 'translateX(0px)' }
+  ], {
+    duration: 300
+  });
+}
+
+function eliminatePlayer() {
+if(!playerAlive) return;
+
+playerAlive=false;
+players[0].alive=false;
+updatePlayerList();
+
+triggerPainfulMistakeFeedback();
+
+eliminatedBanner.style.display='block';
+setTimeout(()=>{
+eliminatedBanner.style.display='none';
+},1500);
+}
+
+function populatePremiumStats(titleText, titleColor) {
+  document.getElementById('title').style.color = titleColor;
+  document.getElementById('subtitle').innerHTML = 'ROUND ' + round;
+  
+  const currentSurvivors = players.filter(p => p.alive).length + (playerAlive ? 0 : 1);
+  document.getElementById('placement').innerHTML = `#${currentSurvivors} / 20 SURVIVORS`;
+  document.getElementById('cause').innerHTML = playerAlive ? "👑 Flawless Technical Match Execution" : `❌ ${specificCauseOfDeath}`;
+  
+  if (currentSurvivors === 2 && !playerAlive) {
+    document.getElementById('almost').innerHTML = "⚡ YOU WERE 1 ROUND FROM VICTORY";
+    document.getElementById('almost').style.display = "block";
+  } else if(playerAlive) {
+    document.getElementById('almost').innerHTML = "🏆 SIMULATION MASTERED CONGRATULATIONS";
+    document.getElementById('almost').style.display = "block";
+  } else {
+    document.getElementById('almost').style.display = "none";
+  }
+  
+  document.getElementById('statRounds').innerHTML = round;
+  document.getElementById('statFastest').innerHTML = fastestTap === Infinity ? "0.00s" : fastestTap.toFixed(2) + "s";
+  
+  const calcAccuracy = totalActions === 0 ? 100 : Math.round((correctActions / totalActions) * 100);
+  document.getElementById('statAccuracy').innerHTML = calcAccuracy + "%";
+  
+  const eliminatedCount = 20 - players.filter(p => p.alive).length - (playerAlive ? 1 : 0);
+  document.getElementById('statEliminated').innerHTML = eliminatedCount;
+  
+  const particlesContainer = document.getElementById("particles");
+  particlesContainer.innerHTML = '';
+  for(let i=0; i<40; i++){
+    const p = document.createElement("div");
+    p.className="particle";
+    p.style.left = Math.random()*100+"vw";
+    p.style.animationDuration = (6+Math.random()*10)+"s";
+    p.style.animationDelay = Math.random()*5+"s";
+    particlesContainer.appendChild(p);
+  }
+
+  if(playerAlive) {
+    document.getElementById('title').innerHTML = "👑 VICTORY 👑";
+    document.getElementById('title').animate([
+      { transform: 'scale(.7)', opacity: 0 },
+      { transform: 'scale(1.1)', opacity: 1 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], {
+      duration: 700
+    });
+  } else {
+    document.getElementById('title').innerHTML = titleText;
+    document.body.animate([
+      {filter:"blur(10px) brightness(2)"},
+      {filter:"blur(0px) brightness(1)"}
+    ],{
+      duration:700,
+      easing:"ease-out"
+    });
+  }
+
+  if(navigator.vibrate){
+    navigator.vibrate([120,80,120]);
+  }
+
+  endScreen.style.display = 'flex';
+  endScreen.scrollTop = 0; 
+}
+
+function winGame(){
+wins++;
+localStorage.setItem('lm_wins',wins);
+winsEl.innerHTML='Wins: '+wins;
+updateRank();
+populatePremiumStats('VICTORY', '#facc15');
+}
+
+function loseGame(){
+updateRank();
+const t=document.getElementById('liveTimer');
+if(t) t.remove();
+clearInterval(roundTimer);
+
+const popup=document.createElement('div');
+popup.style.position='absolute';
+popup.style.inset='0';
+popup.style.background='rgba(0,0,0,.92)';
+popup.style.display='flex';
+popup.style.alignItems='center';
+popup.style.justifyContent='center';
+popup.style.flexDirection='column';
+popup.style.zIndex='200';
+
+popup.innerHTML=`
+<div style="font-size:90px;font-weight:900;color:#ef4444">
+ELIMINATED
+</div>
+
+<div style="font-size:26px;margin-top:10px;opacity:.8">
+What do you want to do?
+</div>
+
+<div style="
+display:flex;
+gap:16px;
+margin-top:35px;
+flex-wrap:wrap;
+justify-content:center;
+">
+<button id="spectateBtn" style="
+padding:16px 28px;
+border:none;
+border-radius:18px;
+font-size:22px;
+font-weight:900;
+background:#22c55e;
+color:black;
+cursor:pointer;
+">
+👁 SPECTATE
+</button>
+
+<button id="restartBtn" style="
+padding:16px 28px;
+border:none;
+border-radius:18px;
+font-size:22px;
+font-weight:900;
+background:#facc15;
+color:black;
+cursor:pointer;
+">
+🔄 RESTART
+</button>
+
+<button id="homeBtn" style="
+padding:16px 28px;
+border:none;
+border-radius:18px;
+font-size:22px;
+font-weight:900;
+background:#334155;
+color:white;
+cursor:pointer;
+">
+🏠 HOME
+</button>
+</div>
+`;
+
+game.appendChild(popup);
+
+document.getElementById('spectateBtn').onclick = ()=>{
+popup.remove();
+startSpectatorMode();
+};
+
+document.getElementById('restartBtn').onclick = ()=>{
+popup.remove();
+restartGame();
+};
+
+document.getElementById('homeBtn').onclick = ()=>{
+popup.remove();
+goHome();
+};
+}
+
+function updateRank(){
+let rank='Bronze';
+let color='#cd7f32';
+if(wins>=3) { rank='Silver'; color='#e2e8f0'; }
+if(wins>=7) { rank='Gold'; color='#facc15'; }
+if(wins>=15) { rank='Diamond'; color='#38bdf8'; }
+if(wins>=30) { rank='Elite'; color='#a855f7'; }
+if(wins>=60) { rank='Last One'; color='#ef4444'; }
+
+rankEl.innerHTML=`<div style="width:14px; height:14px; border-radius:50%; background:${color}; box-shadow:0 0 8px ${color};"></div><span>Rank: ${rank}</span>`;
+}
+
+function clearArena(){
+arena.innerHTML='';
+}
+
+function flashEffect(){
+flash.style.background='white';
+flash.style.opacity='.9';
+setTimeout(()=>{
+flash.style.opacity='0';
+},150);
+}
+
+function goHome(){
+document.querySelectorAll('#spectatorOverlay, [style*="victoryZoom"]').forEach(e => e.remove());
+if(finalDuelAnimInstance) { finalDuelAnimInstance.cancel(); finalDuelAnimInstance = null; }
+game.style.transform = 'none';
+document.body.style.filter = 'none';
+
+game.style.background = 'radial-gradient(circle at top,#172554,#020617 60%)';
+endScreen.style.display='none';
+gameUI.classList.add('hidden');
+menu.classList.remove('hidden');
+clearArena();
+}
+
+function restartGame(){
+document.querySelectorAll('#spectatorOverlay, [style*="victoryZoom"]').forEach(e => e.remove());
+if(finalDuelAnimInstance) { finalDuelAnimInstance.cancel(); finalDuelAnimInstance = null; }
+game.style.transform = 'none';
+document.body.style.filter = 'none';
+
+game.style.background = 'radial-gradient(circle at top,#172554,#020617 60%)';
+endScreen.style.display='none';
+setupPlayers();
+nextRound();
+}
+
+setInterval(()=>{
+  if(acceptingInput && !spectatorMode){
+    document.body.style.backgroundPosition = Math.random()*100+'% ' + Math.random()*100+'%';
+  }
+}, 400);
+
+window.addEventListener('touchstart',(e)=>{
+if(e.target.closest('button') || e.target.closest('.endBtn') || e.target.closest('.btn')) return;
+
+const t=e.touches[0];
+touchFeedback(t.clientX,t.clientY);
+if(currentMiniGame==='freeze' && acceptingInput){
+  freezeTouched=true;
+  triggerPainfulMistakeFeedback();
+}
+},{passive:true});
+
+window.addEventListener('mousedown',(e)=>{
+if(e.target.closest('button') || e.target.closest('.endBtn') || e.target.closest('.btn')) return;
+
+touchFeedback(e.clientX,e.clientY);
+if(currentMiniGame==='freeze' && acceptingInput){
+  freezeTouched=true;
+  triggerPainfulMistakeFeedback();
+}
+});
+
+function startSpectatorMode(){
+spectatorMode = true;
+acceptingInput = false;
+clearArena();
+
+const t=document.getElementById('liveTimer');
+if(t) t.remove();
+clearInterval(roundTimer);
+
+game.animate([
+{ transform:'scale(1)' },
+{ transform:'scale(.92)' }
+],{
+duration:1200,
+fill:'forwards',
+easing:'ease-out'
+});
+
+createSpectatorOverlay();
+simulateFinalBattle();
+}
+
+function createSpectatorOverlay(){
+const old = document.getElementById('spectatorOverlay');
+if(old) old.remove();
+
+const overlay = document.createElement('div');
+overlay.id = 'spectatorOverlay';
+overlay.style.position = 'absolute';
+overlay.style.top = '20px';
+overlay.style.left = '50%';
+overlay.style.transform = 'translateX(-50%)';
+overlay.style.padding = '14px 26px';
+overlay.style.borderRadius = '20px';
+overlay.style.background = 'rgba(0,0,0,.55)';
+overlay.style.backdropFilter = 'blur(12px)';
+overlay.style.fontWeight = '900';
+overlay.style.fontSize = '22px';
+overlay.style.zIndex = '999';
+overlay.innerHTML = '👁 SPECTATING FINAL PLAYERS';
+
+game.appendChild(overlay);
+}
+
+function createKillFeed(text){
+const personalityTexts = [
+'clutched the round',
+'panicked under pressure',
+'made a fatal mistake',
+'survived by milliseconds',
+'collapsed in the duel',
+'outplayed the lobby'
+];
+
+const extra = personalityTexts[Math.floor(Math.random() * personalityTexts.length)];
+
+const feed = document.createElement('div');
+feed.style.position = 'absolute';
+feed.style.right = '20px';
+feed.style.top = (120 + Math.random()*220) + 'px';
+feed.style.padding = '12px 18px';
+feed.style.background = 'rgba(0,0,0,.65)';
+feed.style.borderRadius = '16px';
+feed.style.fontWeight = '800';
+feed.style.zIndex = '999';
+feed.style.animation = 'feedSlide .5s ease';
+
+feed.innerHTML = text + '<br><span style="opacity:.7;font-size:14px;">' + extra + '</span>';
+
+game.appendChild(feed);
+setTimeout(()=>{ feed.remove(); },2600);
+}
+
+function simulateFinalBattle(){
+let aliveBots = players.filter(p=>!p.isPlayer && p.alive);
+
+if(aliveBots.length <= 1){
+setTimeout(()=>{
+const winner = aliveBots[0] || { name: 'AI Champion' };
+showSpectatorWinner(winner);
+},1200);
+return;
+}
+
+const randomA = aliveBots[Math.floor(Math.random()*aliveBots.length)];
+let randomB = aliveBots[Math.floor(Math.random()*aliveBots.length)];
+while(randomA === randomB && aliveBots.length > 1){
+randomB = aliveBots[Math.floor(Math.random()*aliveBots.length)];
+}
+
+const loser = Math.random() > 0.5 ? randomA : randomB;
+loser.alive = false;
+updatePlayerList();
+
+createKillFeed(`💀 ${loser.name} eliminated`);
+
+const remaining = players.filter(p=>p.alive);
+if(remaining.length === 2){
+activateFinalDuelEffects();
+}
+
+setTimeout(()=>{
+simulateFinalBattle();
+},2200);
+}
+
+function activateFinalDuelEffects(){
+if(!finalDuelAnimInstance) {
+finalDuelAnimInstance = document.body.animate([
+{ filter:'contrast(1)' },
+{ filter:'contrast(1.4)' },
+{ filter:'contrast(1)' }
+],{
+duration:1200,
+iterations:Infinity
+});
+}
+
+const overlay = document.getElementById('spectatorOverlay');
+if(overlay){
+overlay.innerHTML = '🔥 FINAL 1v1 SHOWDOWN';
+}
+}
+
+function showSpectatorWinner(winner){
+const overlay = document.getElementById('spectatorOverlay');
+if(overlay){
+overlay.innerHTML = `🏆 ${winner.name} WON THE MATCH`;
+}
+
+const winnerBanner = document.createElement('div');
+winnerBanner.style.position = 'absolute';
+winnerBanner.style.inset = '0';
+winnerBanner.style.display = 'flex';
+winnerBanner.style.alignItems = 'center';
+winnerBanner.style.justifyContent = 'center';
+winnerBanner.style.fontSize = '90px';
+winnerBanner.style.fontWeight = '900';
+winnerBanner.style.background = 'rgba(0,0,0,.65)';
+winnerBanner.style.zIndex = '1000';
+winnerBanner.style.animation = 'victoryZoom 1s ease';
+winnerBanner.innerHTML = `🏆 ${winner.name}`;
+
+game.appendChild(winnerBanner);
+
+setTimeout(()=>{
+winnerBanner.remove();
+populatePremiumStats('DEFEAT', '#ef4444');
+},3500);
+}
+
+updateRank();
+</script>
+</body>
+</html>
